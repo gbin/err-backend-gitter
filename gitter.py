@@ -383,6 +383,8 @@ class GitterBackend(ErrBot):
         response = self.build_message(text)
         response.frm = mess.to
         response.to = mess.frm
+        if mess.frm == self.bot_identifier:
+            return self.build_message("")
         if private:
             response.to = self.build_identifier(mess.frm.nick)
         return response
