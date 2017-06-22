@@ -392,8 +392,10 @@ class GitterBackend(ErrBot):
 
         # listen to the one to one contacts
         # TODO: update that when a new contact adds you up
-        for contact_room in self.contacts():
-            self.follow_room(contact_room)
+
+        all_rooms = self.contacts() + self.rooms()
+        for room in all_rooms:
+            self.follow_room(room)
 
     def serve_once(self):
         self.connect_callback()
