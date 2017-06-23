@@ -239,6 +239,9 @@ class GitterBackend(ErrBot):
                              'Accept': 'application/json'}
         self.bot_identifier = self._get_bot_identifier()
 
+        self._joined_rooms_lock = threading.Lock()
+        self._joined_rooms = []
+
     def _get_bot_identifier(self):
         """
         Query the API for the bot's own identifier.
@@ -297,9 +300,14 @@ class GitterBackend(ErrBot):
                 else:
                     log.debug('Received keep-alive on %s', room.name)
 
-        t = threading.Thread(target=background)
-        t.daemon = True
-        t.start()
+        if room._uri not in self._joined_rooms:
+            t = threading.Thread(target=background)
+            t.daemon = True
+            t.start()
+            with self._joined_rooms_lock:
+                self._joined_rooms.append(room._uri)
+        else:
+            log.info("Already joined the room.")
 
     def rooms(self):
         json_rooms = self.readAPIRequest('rooms')
