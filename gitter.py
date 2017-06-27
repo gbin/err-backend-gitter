@@ -300,14 +300,14 @@ class GitterBackend(ErrBot):
                 else:
                     log.debug('Received keep-alive on %s', room.name)
 
-        if room._uri not in self._joined_rooms:
-            t = threading.Thread(target=background)
-            t.daemon = True
-            t.start()
-            with self._joined_rooms_lock:
+        with self._joined_rooms_lock:
+            if room._uri not in self._joined_rooms:
+                t = threading.Thread(target=background)
+                t.daemon = True
+                t.start()
                 self._joined_rooms.append(room._uri)
-        else:
-            log.info("Already joined the room.")
+            else:
+                log.info("Already joined %s", room.name)
 
     def rooms(self):
         json_rooms = self.readAPIRequest('rooms')
