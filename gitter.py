@@ -358,8 +358,8 @@ class GitterBackend(ErrBot):
         else:
             log.info("Already joined %s", room.name)
 
-    def rooms(self):
-        json_rooms = self.readAPIRequest('rooms')
+    def rooms(self, query=None):
+        json_rooms = self.readAPIRequest('rooms', {'q': query} if query else None)
         rooms = []
         for json_room in json_rooms:
             if not json_room['oneToOne']:
@@ -419,7 +419,7 @@ class GitterBackend(ErrBot):
 
     def query_room(self, room):
         # TODO: maybe we can query the room resource only
-        for native_room in self.rooms():
+        for native_room in self.rooms(room):
             if native_room.uri == room:
                 log.debug("Found room %s" % room)
                 return native_room
