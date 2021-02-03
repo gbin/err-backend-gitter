@@ -205,12 +205,22 @@ class GitterRoom(Room):
             else:
                 raise RoomNotFoundError("Cannot find the room '{}'".format(self.uri))
 
+    def _user_count(self):
+        json_rooms = self._backend.readAPIRequest('rooms')
+        for json_room in json_rooms:
+            if json_room['id'] is self.idd:
+                return json_room['userCount']
+
     @property
     def occupants(self):
         occupants = []
-        json_users = self._backend.readAPIRequest('rooms/%s/users' % self._idd)
-        for json_user in json_users:
-            occupants.append(GitterRoomOccupant.build_from_json(self, json_user))
+        user_count = self._user_count()
+        for skip in range(0, user_count, 100):
+            # 100 is the maximum number of users Gitter API can return.
+            json_users = self._backend.readAPIRequest(
+                    'rooms/%s/users?skip={}?limit={}'.format(self.idd, skip, 100))
+            for json_user in json_users:
+                occupants.append(GitterRoomOccupant.build_from_json(self, json_user))
         return occupants
 
     def __eq_(self, other):
