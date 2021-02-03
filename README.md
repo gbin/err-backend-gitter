@@ -7,7 +7,7 @@ It allows you to use errbot from Gitter.
 ## Installation
 
 ```
-git checkout https://github.com/gbin/err-backend-gitter.git
+git checkout https://github.com/errbotio/err-backend-gitter.git
 ```
 
 and add:
